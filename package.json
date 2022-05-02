@@ -1,0 +1,18 @@
+{
+  "name": "come-on-doctor",
+  "uuid": "19eb5d42-7338-47c2-a133-c84f26715350",
+  "version": "3.4.2",
+  "creator": {
+    "version": "3.4.2"
+  },
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "xstate": "^4.31.0"
+  }
+}
