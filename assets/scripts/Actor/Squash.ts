@@ -23,6 +23,8 @@ import { MessageCenter } from '../framework/MessageCenter';
 import { ActorManager } from './ActorManager';
 import { changeVector } from '../util';
 
+import { service } from '../machine/squash.machine';
+
 const { ccclass, property } = _decorator;
 const eventTarget = new EventTarget();
 
@@ -56,6 +58,17 @@ export class Squash extends ComponentBase {
 
     this.squash = this.node.getChildByName('squash');
     this.squash_back = this.node.getChildByName('squash_back');
+
+    console.log('当前状态');
+    console.log(service.state.value);
+
+    setTimeout(() => {
+      console.log('2s后进入行动状态');
+
+      service.send('MOVING');
+      console.log('当前状态');
+      console.log(service.state.value);
+    }, 2000);
 
     // 注册单个碰撞体的回调函数
     let collider = this.getComponent(Collider2D);
@@ -150,9 +163,7 @@ export class Squash extends ComponentBase {
     const lor = this._moveDirection.x > 0;
     const tob = this._moveDirection.y > 0;
 
-
     // 根据上下左右改变主角的朝向
     this.changePlayerByDirection(lor, tob);
-
   }
 }
