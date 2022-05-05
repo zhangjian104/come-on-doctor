@@ -14,6 +14,7 @@ import {
   Contact2DType,
   Collider2D,
   IPhysics2DContact,
+  UITransform,
 } from 'cc';
 
 import { ComponentBase } from '../framework/ComponentBase';
@@ -105,59 +106,33 @@ export class Squash extends ComponentBase {
     this._moveDirection = direction;
   }
 
-  // 处理与墙壁的碰撞
-  private playerContactWall(curPos, pos) {
-    const { isContact, tag } = this.contact;
-    console.log(this._moveDirection);
+  private changePlayerByDirection(lor, tob) {
+    // 上左
+    if (lor && tob) {
+      this.squash_back.setRotationFromEuler(0, 0, 0);
+      this.squash.active = false;
+      this.squash_back.active = true;
+    }
+    // 上右
+    if (!lor && tob) {
+      this.squash_back.setRotationFromEuler(0, 180, 0);
 
-    if (isContact) {
-      if (tag === 0 || tag === 1) {
-        const dir = !!(tag === 0 || tag === 1);
+      this.squash.active = false;
+      this.squash_back.active = true;
+    }
+    // / 下左
+    if (lor && !tob) {
+      this.squash.setRotationFromEuler(0, 0, 0);
 
-        this.node.position = new Vec3(
-          curPos.x + (dir && 0),
-          curPos.y + pos.y,
-          0
-        );
+      this.squash.active = true;
+      this.squash_back.active = false;
+    }
+    //下右
+    if (!lor && !tob) {
+      this.squash.setRotationFromEuler(0, 180, 0);
 
-        if (this._moveDirection.x > 0 && tag === 0) {
-          this.contact = {
-            isContact: false,
-            tag,
-          };
-        }
-
-        if (this._moveDirection.x < 0 && tag === 1) {
-          this.contact = {
-            isContact: false,
-            tag,
-          };
-        }
-      } else {
-        const dirY = !!(tag === 2 || tag === 3);
-
-        this.node.position = new Vec3(
-          curPos.x + pos.x,
-          curPos.y + (dirY && 0),
-          0
-        );
-
-        if (this._moveDirection.y < 0 && tag === 2) {
-          this.contact = {
-            isContact: false,
-            tag,
-          };
-        }
-
-        if (this._moveDirection.y > 0 && tag === 3) {
-          this.contact = {
-            isContact: false,
-            tag,
-          };
-        }
-      }
-    } else {
-      this.node.position = new Vec3(pos.x + curPos.x, pos.y + curPos.y, 0);
+      this.squash.active = true;
+      this.squash_back.active = false;
     }
   }
 
@@ -171,21 +146,13 @@ export class Squash extends ComponentBase {
     );
     const curPos = this.node.position;
     this.node.position = new Vec3(pos.x + curPos.x, pos.y + curPos.y, 0);
-    // this.playerContactWall(curPos, pos);
 
     const lor = this._moveDirection.x > 0;
     const tob = this._moveDirection.y > 0;
-    // 区分左右
-    lor
-      ? this.node.setRotationFromEuler(0, 0, 0)
-      : this.node.setRotationFromEuler(0, 180, 0);
-    //  区分上下
-    if (tob) {
-      this.squash.active = false;
-      this.squash_back.active = true;
-    } else {
-      this.squash.active = true;
-      this.squash_back.active = false;
-    }
+
+
+    // 根据上下左右改变主角的朝向
+    this.changePlayerByDirection(lor, tob);
+
   }
 }
