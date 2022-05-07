@@ -46,6 +46,7 @@ export class Squash extends ComponentBase {
   private squash: Node;
   private squash_back: Node;
   private squash_arrow: Node;
+  private squash_weapon: Node;
 
   private contact = {
     isContact: false,
@@ -60,6 +61,7 @@ export class Squash extends ComponentBase {
     this.squash = this.node.getChildByName('squash');
     this.squash_back = this.node.getChildByName('squash_back');
     this.squash_arrow = this.node.getChildByName('arrow');
+    this.squash_weapon = this.node.getChildByName('weapon');
 
     console.log('当前状态');
     console.log(service.state.value);
@@ -164,6 +166,10 @@ export class Squash extends ComponentBase {
         : (_angle * 180) / Math.PI;
 
     this.squash_arrow.setRotationFromEuler(0, 0, arrowAngle);
+
+    // 武器与箭头（主角运动方向）总是垂直的
+    this.squash_weapon.setRotationFromEuler(0, 0, arrowAngle - 120);
+
 
     const pos = new Vec3(
       this._moveDirection.x * this.speed * deltaTime,
