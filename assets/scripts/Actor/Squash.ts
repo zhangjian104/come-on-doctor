@@ -63,16 +63,7 @@ export class Squash extends ComponentBase {
     this.squash_arrow = this.node.getChildByName('arrow');
     this.squash_weapon = this.node.getChildByName('weapon');
 
-    console.log('当前状态');
-    console.log(service.state.value);
 
-    setTimeout(() => {
-      console.log('2s后进入行动状态');
-
-      service.send('MOVING');
-      console.log('当前状态');
-      console.log(service.state.value);
-    }, 2000);
 
     // 注册单个碰撞体的回调函数
     let collider = this.getComponent(Collider2D);
@@ -184,5 +175,11 @@ export class Squash extends ComponentBase {
 
     // 根据上下左右改变主角的朝向
     this.changePlayerByDirection(lor, tob);
+
+    // 中垂线方程,(x1,y1) (x2,y2) 为已知两点
+    // 中点坐标： (x1+x2)/2,(y1+y2)/2 ） 
+    // y=-(x1-x2)/(y1-y2)x+(y1+y2)/2+(x1-x2)/(y1-y2)*(x1+x2)/2
+    // 二阶贝塞尔曲线
+    // B(t) = (1-t)*(1-t)*P0 + 2*t*(1-t)*P1 + t*t*P2
   }
 }

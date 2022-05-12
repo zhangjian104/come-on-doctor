@@ -9,7 +9,6 @@ export class hp extends ComponentBase {
   hp: number = 100;
 
   start() {
-    console.log(UIManager.Instance);
     
     // 注册为ui的消息接受者
     UIManager.Instance.registerReceiver(this);

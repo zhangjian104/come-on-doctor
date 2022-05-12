@@ -26,7 +26,6 @@ export class ManagerBase extends ComponentBase {
     this.messageType = this.setMessageType();
     // 把管理类添加到消息中心列表中
     MessageCenter.managers.push(this);
-    console.log(this.ReceiveList);
     
   }
 
