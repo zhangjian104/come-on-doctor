@@ -1,17 +1,15 @@
 import { _decorator, Component, Node, Label } from 'cc';
 import { ComponentBase } from '../framework/ComponentBase';
-import { Message, MessageType } from '../framework/Message';
-import { UIManager } from './UIManager';
+import { Message } from '../framework/Message';
 const { ccclass, property } = _decorator;
-
+import { MessageCenter } from '../framework/MessageCenter';
 @ccclass('hp')
 export class hp extends ComponentBase {
   hp: number = 100;
 
   start() {
-    
     // 注册为ui的消息接受者
-    UIManager.Instance.registerReceiver(this);
+    MessageCenter.registerReceiver(this);
   }
 
   // receiveMessage(msg: Message) {

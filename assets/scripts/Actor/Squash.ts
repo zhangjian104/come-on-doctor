@@ -15,24 +15,18 @@ import {
   Collider2D,
   IPhysics2DContact,
   UITransform,
+  BoxCollider2D,
 } from 'cc';
 
 import { ComponentBase } from '../framework/ComponentBase';
-import { Message, MessageType } from '../framework/Message';
+import { Message } from '../framework/Message';
 import { MessageCenter } from '../framework/MessageCenter';
-import { ActorManager } from './ActorManager';
 import { changeVector } from '../util';
-
+import { BroadcastRoom } from '../framework/BroadcastRoom';
 import { service } from '../machine/squash.machine';
+import { v2c } from '../framework/utils';
 
 const { ccclass, property } = _decorator;
-const eventTarget = new EventTarget();
-
-/**
- * 主角状态
- * 默认状态：播放抖动动画
- *
- */
 
 @ccclass('Squash')
 export class Squash extends ComponentBase {
@@ -47,6 +41,8 @@ export class Squash extends ComponentBase {
   private squash_back: Node;
   private squash_arrow: Node;
   private squash_weapon: Node;
+  private weapon_box: Node;
+  private ball: Node;
 
   private contact = {
     isContact: false,
@@ -55,37 +51,46 @@ export class Squash extends ComponentBase {
   };
 
   start() {
-    // 注册为ui的消息接受者
-    ActorManager.Instance.registerReceiver(this);
+    // 在消息中心注册，以便全局消息分发
+    MessageCenter.registerReceiver(this);
+
+    BroadcastRoom.subscribe('event.squash.back.idle', () => {
+      this.weapon_box.active = false;
+    });
+    BroadcastRoom.subscribe('event.squash.start.moving', () => {
+      console.log('开始运动');
+
+      this.weapon_box.active = true;
+    });
 
     this.squash = this.node.getChildByName('squash');
     this.squash_back = this.node.getChildByName('squash_back');
-    this.squash_arrow = this.node.getChildByName('arrow');
-    this.squash_weapon = this.node.getChildByName('weapon');
+    // this.squash_arrow = this.node.getChildByName('arrow');
+    // this.squash_weapon = this.node.getChildByName('weapon');
+    this.weapon_box = this.node.getChildByName('weapon_box');
 
-
+    this.ball = this.node.parent.getChildByName('weapon');
 
     // 注册单个碰撞体的回调函数
-    let collider = this.getComponent(Collider2D);
+    // let collider = this.node.getComponents(BoxCollider2D)
+    // console.log('主角碰撞体：');
+    // console.log(collider[1]);
 
-    if (collider) {
-      collider.on(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
-      collider.on(Contact2DType.END_CONTACT, this.onEndContact, this);
-    }
+    // collider[1].on(Contact2DType.BEGIN_CONTACT,this.onBeginContactFromOut,this)
+
+    // if (collider) {
+    //   collider.on(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
+    //   collider.on(Contact2DType.END_CONTACT, this.onEndContact, this);
+    // }
   }
 
-  onBeginContact(
+  onBeginContactFromOut(
     selfCollider: Collider2D,
     otherCollider: Collider2D,
     contact: IPhysics2DContact | null
   ) {
-    console.log('开始碰撞');
-
-    // 只在两个碰撞体开始接触时被调用一次
-    this.contact = {
-      isContact: true,
-      tag: otherCollider.tag,
-    };
+    console.log('外围碰撞体开始碰撞,碰撞者为；');
+    console.log(otherCollider);
   }
   onEndContact(
     selfCollider: Collider2D,
@@ -102,12 +107,12 @@ export class Squash extends ComponentBase {
   }
 
   receiveMessage(msg: Message) {
-    super.receiveMessage(msg);
-    if (msg.Command === MessageType.Actor_Squash_MoveIng) {
+    if (msg.Command === 'squash.moving.direction') {
       this.move(msg.Content);
     }
-    if (msg.Command === MessageType.Actor_Squash_MoveEnd) {
+    if (msg.Command === 'squash.moved.direction') {
       this.move(msg.Content);
+      service.send('IDLE');
     }
   }
   public move(direction: Vec2) {
@@ -144,23 +149,61 @@ export class Squash extends ComponentBase {
     }
   }
 
+  //
+  private onContactWithBall() {
+    const DIS = 100;
+    const ANG = 30;
+    // 小球的位置
+    const ballPos = this.ball.getWorldPosition();
+
+    // 主角当前的位置和方向
+    const curPos = this.node.getWorldPosition();
+    // const curDirection = ballPos.subtract3f(curPos.x, curPos.y, curPos.z);
+
+    // 主角箭头方向
+    // const arrowPos = this.squash_arrow.getWorldPosition();
+    // const angle = Vec2.angle(
+    //   v2(curDirection.x, curDirection.y),
+    //   v2(arrowPos.x, arrowPos.y)
+    // );
+
+    // console.log((angle * 180) / Math.PI);
+
+    const distance = Vec2.distance(
+      v2(curPos.x, curPos.y),
+      v2(ballPos.x, ballPos.y)
+    );
+
+    // 当夹角小于n，距离小于len时则判定碰撞
+    if (distance < 100) {
+      service.send('ATTACK');
+    }
+  }
+
   update(deltaTime: number) {
     if (!this._moveDirection) return;
 
+    // 如果当前是attack状态，则暂时不能行动直到状态解除
+    if (service.state.value === 'attack') {
+      return;
+    }
+
+    // 进入moving状态
+    service.send('MOVING');
+
     // 求主角与箭头的夹角
     const _angle = this._moveDirection.angle(
-      v2(this.squash_arrow.worldPosition.x, this.squash_arrow.worldPosition.y)
+      v2(this.weapon_box.worldPosition.x, this.weapon_box.worldPosition.y)
     );
     const arrowAngle =
       this._moveDirection.x > 0
         ? -((_angle * 180) / Math.PI)
         : (_angle * 180) / Math.PI;
 
-    this.squash_arrow.setRotationFromEuler(0, 0, arrowAngle);
+    this.weapon_box.setRotationFromEuler(0, 0, arrowAngle);
 
-    // 武器与箭头（主角运动方向）总是垂直的
-    this.squash_weapon.setRotationFromEuler(0, 0, arrowAngle - 120);
-
+    // // 武器与箭头（主角运动方向）总是垂直的
+    // this.squash_weapon.setRotationFromEuler(0, 0, arrowAngle - 120);
 
     const pos = new Vec3(
       this._moveDirection.x * this.speed * deltaTime,
@@ -176,10 +219,7 @@ export class Squash extends ComponentBase {
     // 根据上下左右改变主角的朝向
     this.changePlayerByDirection(lor, tob);
 
-    // 中垂线方程,(x1,y1) (x2,y2) 为已知两点
-    // 中点坐标： (x1+x2)/2,(y1+y2)/2 ） 
-    // y=-(x1-x2)/(y1-y2)x+(y1+y2)/2+(x1-x2)/(y1-y2)*(x1+x2)/2
-    // 二阶贝塞尔曲线
-    // B(t) = (1-t)*(1-t)*P0 + 2*t*(1-t)*P1 + t*t*P2
+    // 处理主角与小球的碰撞
+    this.onContactWithBall();
   }
 }

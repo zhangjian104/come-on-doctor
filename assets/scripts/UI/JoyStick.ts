@@ -13,9 +13,7 @@ import {
   Vec3,
 } from 'cc';
 import { ComponentBase } from '../framework/ComponentBase';
-import { MessageType } from '../framework/Message';
 import { MessageCenter } from '../framework/MessageCenter';
-import { UIManager } from './UIManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('JoyStick')
@@ -29,7 +27,7 @@ export class JoyStick extends ComponentBase {
 
   start() {
     // 注册为ui的消息接受者
-    UIManager.Instance.registerReceiver(this);
+    MessageCenter.registerReceiver(this);
 
     this._radius =
       this.node.getComponent(UITransform)!.width * 0.5 -
@@ -69,20 +67,12 @@ export class JoyStick extends ComponentBase {
       this._radius < distance ? v3(offsetX, offsetY, 0) : v3(move.x, move.y, 0)
     );
 
-    MessageCenter.sendCustomMessage(
-      MessageType.TypeActor,
-      MessageType.Actor_Squash_MoveIng,
-      move.normalize()
-    );
+    MessageCenter.sendMessage('squash.moving.direction', move.normalize());
   }
 
   private onTouchEnd(event: EventTouch) {
     this.circle.setPosition(Vec3.ZERO);
-    MessageCenter.sendCustomMessage(
-      MessageType.TypeActor,
-      MessageType.Actor_Squash_MoveEnd,
-      undefined
-    );
+    MessageCenter.sendMessage('squash.moved.direction', undefined);
   }
 
   onDisable() {

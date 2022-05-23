@@ -5,21 +5,20 @@ const { ccclass, property } = _decorator;
 
 @ccclass('MessageCenter')
 export class MessageCenter {
-  // 管理类列表
-  static managers: ComponentBase[] = [];
-
+  static components: ComponentBase[] = [];
+  // 注册组件
+  static registerReceiver(component: ComponentBase) {
+    this.components.push(component);
+  }
   // 发送消息
-  private static sendMessage(msg: Message) {
-    // console.log(this.managers);
-
-    for (let manager of this.managers) {
-      manager.receiveMessage(msg);
+  private static sendCustomMessage(msg: Message) {
+    for (let component of this.components) {
+      component.receiveMessage(msg);
     }
   }
 
-  static sendCustomMessage(type: number, command: number, content: any) {
-    const msg = new Message(type, command, content);
-
-    this.sendMessage(msg);
+  static sendMessage(command: string, content: any) {
+    const msg = new Message(command, content);
+    this.sendCustomMessage(msg);
   }
 }
