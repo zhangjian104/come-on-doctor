@@ -16,6 +16,7 @@ import {
   IPhysics2DContact,
   UITransform,
   BoxCollider2D,
+  Animation,
 } from 'cc';
 
 import { ComponentBase } from '../framework/ComponentBase';
@@ -63,6 +64,15 @@ export class Squash extends ComponentBase {
       this.weapon_box.active = true;
     });
 
+    BroadcastRoom.subscribe('squash.moving.direction', (content) => {
+      this.move(content);
+    });
+
+    BroadcastRoom.subscribe('squash.moved.direction', (content) => {
+      this.move(content);
+      service.send('IDLE');
+    });
+
     this.squash = this.node.getChildByName('squash');
     this.squash_back = this.node.getChildByName('squash_back');
     // this.squash_arrow = this.node.getChildByName('arrow');
@@ -71,17 +81,19 @@ export class Squash extends ComponentBase {
 
     this.ball = this.node.parent.getChildByName('weapon');
 
-    // 注册单个碰撞体的回调函数
-    // let collider = this.node.getComponents(BoxCollider2D)
-    // console.log('主角碰撞体：');
-    // console.log(collider[1]);
+    // 获取动画组件
+    const clips = this.node.getComponents(Animation)[0];
+    BroadcastRoom.subscribe('event.squash.attack.play', (content) => {
+      // 播放攻击动画
+      console.log(clips);
 
-    // collider[1].on(Contact2DType.BEGIN_CONTACT,this.onBeginContactFromOut,this)
+      clips.play();
 
-    // if (collider) {
-    //   collider.on(Contact2DType.BEGIN_CONTACT, this.onBeginContact, this);
-    //   collider.on(Contact2DType.END_CONTACT, this.onEndContact, this);
-    // }
+      // 1s后进入idle状态
+      setTimeout(() => {
+        service.send('IDLE');
+      }, 500);
+    });
   }
 
   onBeginContactFromOut(
@@ -106,15 +118,6 @@ export class Squash extends ComponentBase {
     };
   }
 
-  receiveMessage(msg: Message) {
-    if (msg.Command === 'squash.moving.direction') {
-      this.move(msg.Content);
-    }
-    if (msg.Command === 'squash.moved.direction') {
-      this.move(msg.Content);
-      service.send('IDLE');
-    }
-  }
   public move(direction: Vec2) {
     this._moveDirection = direction;
   }

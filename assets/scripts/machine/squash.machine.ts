@@ -4,15 +4,10 @@ import { BroadcastRoom } from '../framework/BroadcastRoom';
 
 function playAttackAnim(context, event) {
   console.log('进入打击动画状态');
-  // console.log(context, event);
-  setTimeout(() => {
-    console.log('2s了，动画播放结束');
-    service.send('IDLE');
-  }, 2000);
+  BroadcastRoom.publish('event.squash.attack.play');
 }
 
 function goBackToIdle(context, event) {
-  console.log('回到静止状态');
   BroadcastRoom.publish('event.squash.back.idle');
 }
 
@@ -22,9 +17,7 @@ function startMoving() {
 // 创建主角的状态机
 const squashMachine = createMachine({
   id: 'squashPlayer',
-
   context: {},
-
   initial: 'idle',
   states: {
     // 静止状态

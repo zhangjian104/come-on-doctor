@@ -14,6 +14,7 @@ import {
 } from 'cc';
 import { ComponentBase } from '../framework/ComponentBase';
 import { MessageCenter } from '../framework/MessageCenter';
+import { BroadcastRoom } from '../framework/BroadcastRoom';
 const { ccclass, property } = _decorator;
 
 @ccclass('JoyStick')
@@ -67,12 +68,12 @@ export class JoyStick extends ComponentBase {
       this._radius < distance ? v3(offsetX, offsetY, 0) : v3(move.x, move.y, 0)
     );
 
-    MessageCenter.sendMessage('squash.moving.direction', move.normalize());
+    BroadcastRoom.publish('squash.moving.direction', move.normalize());
   }
 
   private onTouchEnd(event: EventTouch) {
     this.circle.setPosition(Vec3.ZERO);
-    MessageCenter.sendMessage('squash.moved.direction', undefined);
+    BroadcastRoom.publish('squash.moved.direction', undefined);
   }
 
   onDisable() {
