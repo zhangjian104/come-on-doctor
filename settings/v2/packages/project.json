@@ -4,5 +4,27 @@
       "width": 640,
       "height": 1136
     }
+  },
+  "physics": {
+    "collisionGroups": [
+      {
+        "index": 1,
+        "name": "wall"
+      },
+      {
+        "index": 2,
+        "name": "squash"
+      },
+      {
+        "index": 3,
+        "name": "ball"
+      }
+    ],
+    "collisionMatrix": {
+      "0": 1,
+      "1": 12,
+      "2": 2,
+      "3": 2
+    }
   }
 }

@@ -60,7 +60,6 @@ export class Squash extends ComponentBase {
     });
     BroadcastRoom.subscribe('event.squash.start.moving', () => {
       console.log('开始运动');
-
       this.weapon_box.active = true;
     });
 
@@ -85,10 +84,7 @@ export class Squash extends ComponentBase {
     const clips = this.node.getComponents(Animation)[0];
     BroadcastRoom.subscribe('event.squash.attack.play', (content) => {
       // 播放攻击动画
-      console.log(clips);
-
       clips.play();
-
       // 1s后进入idle状态
       setTimeout(() => {
         service.send('IDLE');
@@ -180,6 +176,7 @@ export class Squash extends ComponentBase {
     // 当夹角小于n，距离小于len时则判定碰撞
     if (distance < 100) {
       service.send('ATTACK');
+      BroadcastRoom.publish('event.ball.behit.squash', this._moveDirection);
     }
   }
 
