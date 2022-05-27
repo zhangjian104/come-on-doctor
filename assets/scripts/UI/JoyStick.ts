@@ -13,7 +13,6 @@ import {
   Vec3,
 } from 'cc';
 import { ComponentBase } from '../framework/ComponentBase';
-import { MessageCenter } from '../framework/MessageCenter';
 import { BroadcastRoom } from '../framework/BroadcastRoom';
 const { ccclass, property } = _decorator;
 
@@ -27,22 +26,25 @@ export class JoyStick extends ComponentBase {
   private _radius: number = 0;
 
   start() {
-    // 注册为ui的消息接受者
-    MessageCenter.registerReceiver(this);
+    this.node.active = false;
+    // 监听全局input事件
+    input.on(Input.EventType.TOUCH_START, this.onTouchStart, this);
+    input.on(Input.EventType.TOUCH_MOVE, this.onTouchMove, this);
+    input.on(Input.EventType.TOUCH_END, this.onTouchEnd, this);
+    input.on(Input.EventType.TOUCH_CANCEL, this.onTouchEnd, this);
 
     this._radius =
       this.node.getComponent(UITransform)!.width * 0.5 -
       this.circle.getComponent(UITransform)!.width * 0.5;
   }
 
-  onEnable() {
-    this.node.on(Node.EventType.TOUCH_START, this.onTouchStart, this);
-    this.node.on(Node.EventType.TOUCH_MOVE, this.onTouchMove, this);
-    this.node.on(Node.EventType.TOUCH_END, this.onTouchEnd, this);
-    this.node.on(Node.EventType.TOUCH_CANCEL, this.onTouchEnd, this);
-  }
-
+  onEnable() {}
   private onTouchStart(event: EventTouch) {
+    this.node.active = true;
+
+    const pos = v2();
+    event.getUILocation(pos);
+    this.node.setWorldPosition(v3(pos.x, pos.y, 0));
     event.getLocation(this._pointA);
   }
 
@@ -74,9 +76,7 @@ export class JoyStick extends ComponentBase {
   private onTouchEnd(event: EventTouch) {
     this.circle.setPosition(Vec3.ZERO);
     BroadcastRoom.publish('squash.moved.direction', undefined);
-  }
-
-  onDisable() {
-    this.node.targetOff(this);
+    // 隐藏此组件
+    this.node.active = false;
   }
 }
