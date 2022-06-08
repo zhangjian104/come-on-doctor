@@ -9,3 +9,9 @@ export function changeVector(v: Vec2 | Vec3) {
   }
   return _v;
 }
+
+// 在范围内生成随机数
+export function getRandom(n, m) {
+  var num = Math.floor(Math.random() * (m - n + 1) + n);
+  return num;
+}

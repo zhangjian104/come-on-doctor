@@ -17,5 +17,9 @@ export class Main extends Component {
       EPhysics2DDrawFlags.CenterOfMass |
       EPhysics2DDrawFlags.Joint |
       EPhysics2DDrawFlags.Shape;
+
+
+      
+      
   }
 }

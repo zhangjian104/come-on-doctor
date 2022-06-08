@@ -44,6 +44,8 @@ export class JoyStick extends ComponentBase {
 
     const pos = v2();
     event.getUILocation(pos);
+    console.log(pos);
+    
     this.node.setWorldPosition(v3(pos.x, pos.y, 0));
     event.getLocation(this._pointA);
   }
