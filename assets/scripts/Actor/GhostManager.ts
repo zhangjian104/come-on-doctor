@@ -20,14 +20,8 @@ export class GhostManager extends Component {
   // 所有ghost实例
   ghostList: Node[];
   start() {
-    const self = this;
-
     // ghost随机生成的位置被框在一个包围盒内
     // 包围盒为Wall-rect节点，ghost所有的原点都随机落在此盒内
-    // height: 598.7;
-    // width: 396.80000000000007;
-    // x: 121.60000000000005;
-    // y: 371.7013333333333;
     BroadcastRoom.subscribe('event.wall.rect', (rect) => {
       this.restrictedRect = rect;
     });
@@ -37,14 +31,14 @@ export class GhostManager extends Component {
       ['119d3105-e090-4ec5-8976-106626774890'],
       (err, prefab) => {
         // 生成固定数量的ghost
-        this.spawnGhostByNum(5, prefab);
+        this.spawnGhostByNum(6, prefab);
       }
     );
   }
 
   private spawnGhostByNum(num, prefab) {
     while (num) {
-      if (this.spawnGhost(prefab)) num--;
+      this.spawnGhost(prefab) && num--;
     }
   }
 
