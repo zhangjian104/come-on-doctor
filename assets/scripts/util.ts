@@ -1,4 +1,4 @@
-import { Vec2, Vec3 } from 'cc';
+import { v3, Vec2, Vec3 } from 'cc';
 
 export function changeVector(v: Vec2 | Vec3) {
   let _v: Vec2 | Vec3;
@@ -14,4 +14,17 @@ export function changeVector(v: Vec2 | Vec3) {
 export function getRandom(n, m) {
   var num = Math.floor(Math.random() * (m - n + 1) + n);
   return num;
+}
+
+/**
+ * 节点匀速移动
+ * @param normalVec 方向向量
+ * @param t 帧间隔，update方法第一个参数
+ * @param speed 自定义速度
+ * @param node 当前操作的节点
+ */
+export function nodeMove(normalVec, t, speed, node) {
+  const pos = new Vec3(normalVec.x * t * speed, normalVec.y * t * speed, 0);
+  const curPos = node.worldPosition;
+  node.setWorldPosition(v3(curPos.x + pos.x, curPos.y + pos.y, 0));
 }

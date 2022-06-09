@@ -22,7 +22,7 @@ import {
 import { ComponentBase } from '../framework/ComponentBase';
 import { Message } from '../framework/Message';
 import { MessageCenter } from '../framework/MessageCenter';
-import { changeVector } from '../util';
+import { changeVector, nodeMove } from '../util';
 import { BroadcastRoom } from '../framework/BroadcastRoom';
 import { service } from '../machine/squash.machine';
 import { v2c } from '../framework/utils';
@@ -204,14 +204,8 @@ export class Squash extends ComponentBase {
 
     // // 武器与箭头（主角运动方向）总是垂直的
     // this.squash_weapon.setRotationFromEuler(0, 0, arrowAngle - 120);
-
-    const pos = new Vec3(
-      this._moveDirection.x * this.speed * deltaTime,
-      this._moveDirection.y * this.speed * deltaTime,
-      0
-    );
-    const curPos = this.node.position;
-    this.node.position = new Vec3(pos.x + curPos.x, pos.y + curPos.y, 0);
+    nodeMove(this._moveDirection,deltaTime,this.speed,this.node)
+   
 
     const lor = this._moveDirection.x > 0;
     const tob = this._moveDirection.y > 0;
