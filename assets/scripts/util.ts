@@ -1,4 +1,4 @@
-import { v3, Vec2, Vec3 } from 'cc';
+import { Collider2D, v2, v3, Vec2, Vec3 } from 'cc';
 
 export function changeVector(v: Vec2 | Vec3) {
   let _v: Vec2 | Vec3;
