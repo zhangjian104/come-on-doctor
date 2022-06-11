@@ -45,6 +45,9 @@ export class Squash extends ComponentBase {
   private weapon_box: Node;
   private ball: Node;
 
+  // 控制主角的击球频率
+  private isFreezeAttack: boolean = true;
+
   private contact = {
     isContact: false,
     // 区分四面墙tag
@@ -95,16 +98,12 @@ export class Squash extends ComponentBase {
     selfCollider: Collider2D,
     otherCollider: Collider2D,
     contact: IPhysics2DContact | null
-  ) {
-
-  }
+  ) {}
   onEndContact(
     selfCollider: Collider2D,
     otherCollider: Collider2D,
     contact: IPhysics2DContact | null
   ) {
-
-
     // 只在两个碰撞体结束接触时被调用一次
     this.contact = {
       isContact: false,
@@ -173,8 +172,16 @@ export class Squash extends ComponentBase {
 
     // 当夹角小于n，距离小于len时则判定碰撞
     if (distance < 100) {
-      service.send('ATTACK');
-      BroadcastRoom.publish('event.ball.behit.squash', this._moveDirection);
+      if (this.isFreezeAttack) {
+        service.send('ATTACK');
+        BroadcastRoom.publish('event.ball.behit.squash', this._moveDirection);
+        this.isFreezeAttack = false;
+
+        this.scheduleOnce(() => {
+          // 1s之后才可以重新击球
+          this.isFreezeAttack = true;
+        }, 1);
+      }
     }
   }
 
@@ -202,8 +209,7 @@ export class Squash extends ComponentBase {
 
     // // 武器与箭头（主角运动方向）总是垂直的
     // this.squash_weapon.setRotationFromEuler(0, 0, arrowAngle - 120);
-    nodeMove(this._moveDirection,deltaTime,this.speed,this.node)
-   
+    nodeMove(this._moveDirection, deltaTime, this.speed, this.node);
 
     const lor = this._moveDirection.x > 0;
     const tob = this._moveDirection.y > 0;
