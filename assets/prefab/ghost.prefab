@@ -288,7 +288,7 @@
     "bullet": false,
     "awakeOnLoad": true,
     "_group": 16,
-    "_type": 2,
+    "_type": 1,
     "_allowSleep": false,
     "_gravityScale": 0,
     "_linearDamping": 0,

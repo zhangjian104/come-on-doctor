@@ -28,3 +28,29 @@ export function nodeMove(normalVec, t, speed, node) {
   const curPos = node.worldPosition;
   node.setWorldPosition(v3(curPos.x + pos.x, curPos.y + pos.y, 0));
 }
+
+/**
+ * 处理
+ * @param contact
+ * @param _moveDirection
+ */
+export function contactAndBounce(contact, _moveDirection) {
+  let normal;
+  const localNormal = contact.getManifold().localNormal;
+  const { x, y } = localNormal;
+  if ((x === -1 && y === -0) || (x === 1 && y === -0)) {
+    normal = 'y';
+  } else {
+    normal = 'x';
+  }
+
+  if (normal === 'y') {
+    _moveDirection = v3(-_moveDirection.x, _moveDirection.y, 0);
+  }
+
+  if (normal === 'x') {
+    _moveDirection = v3(_moveDirection.x, -_moveDirection.y, 0);
+  }
+
+  return _moveDirection;
+}

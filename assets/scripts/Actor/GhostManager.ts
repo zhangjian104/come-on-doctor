@@ -37,9 +37,15 @@ export class GhostManager extends Component {
   }
 
   private spawnGhostByNum(num, prefab) {
-    while (num) {
-      this.spawnGhost(prefab) && num--;
-    }
+    // while (num) {
+    //   this.spawnGhost(prefab) && num--;
+    // }
+    this.spawnGhost(prefab) 
+    this.spawnGhost(prefab) 
+    this.spawnGhost(prefab) 
+    this.spawnGhost(prefab) 
+    this.spawnGhost(prefab) 
+    this.spawnGhost(prefab) 
   }
 
   private spawnGhost(prefab) {
@@ -62,7 +68,6 @@ export class GhostManager extends Component {
       .getBoundingBoxToWorld();
     const isCoincide = this.isCoincide(curRect, prefabInst);
     if (isCoincide === false) {
-      console.log(this.node.getChildByName(randomTag));
       this.node.getChildByName(randomTag).destroy();
       return false;
     }
@@ -86,7 +91,6 @@ export class GhostManager extends Component {
   private rectCoincide(rect1, rect2) {
     const w = Math.abs(rect1.x - rect2.x) + rect1.width < 2 * rect1.width;
     const h = Math.abs(rect1.y - rect2.y) + rect1.height < 2 * rect1.height;
-    console.log('重合了');
     // 两者都为true则必然重合
     return w && h;
   }

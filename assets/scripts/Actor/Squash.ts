@@ -59,7 +59,6 @@ export class Squash extends ComponentBase {
       this.weapon_box.active = false;
     });
     BroadcastRoom.subscribe('event.squash.start.moving', () => {
-      console.log('开始运动');
       this.weapon_box.active = true;
     });
 
@@ -97,15 +96,14 @@ export class Squash extends ComponentBase {
     otherCollider: Collider2D,
     contact: IPhysics2DContact | null
   ) {
-    console.log('外围碰撞体开始碰撞,碰撞者为；');
-    console.log(otherCollider);
+
   }
   onEndContact(
     selfCollider: Collider2D,
     otherCollider: Collider2D,
     contact: IPhysics2DContact | null
   ) {
-    console.log('结束碰撞');
+
 
     // 只在两个碰撞体结束接触时被调用一次
     this.contact = {
