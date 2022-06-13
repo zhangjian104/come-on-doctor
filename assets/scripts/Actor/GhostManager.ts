@@ -9,6 +9,7 @@ import {
   Rect,
   v2,
   UITransform,
+  resources,
 } from 'cc';
 import { BroadcastRoom } from '../framework/BroadcastRoom';
 import { getRandom } from '../util';
@@ -25,15 +26,11 @@ export class GhostManager extends Component {
     BroadcastRoom.subscribe('event.wall.rect', (rect) => {
       this.restrictedRect = rect;
     });
-
-    // 通过uuid动态加载预制资源
-    assetManager.loadAny(
-      ['119d3105-e090-4ec5-8976-106626774890'],
-      (err, prefab) => {
-        // 生成固定数量的ghost
-        this.spawnGhostByNum(6, prefab);
-      }
-    );
+    // 通过resources加载预制体资源
+    resources.load('prefab/ghost',Prefab, (err, prefab) => {
+      // 生成固定数量的ghost
+      this.spawnGhostByNum(6, prefab);
+    })
   }
 
   private spawnGhostByNum(num, prefab) {

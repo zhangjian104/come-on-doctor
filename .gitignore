@@ -22,3 +22,4 @@ native
 # WebStorm
 #//////////////////////////
 .idea/
+**/*.meta
